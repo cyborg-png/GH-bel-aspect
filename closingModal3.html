@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Guest House Bel Aspect — Comfortable rooms, delicious breakfast and a great location. Book now.">
+    <title>Guest House Bel Aspect - Home</title>
+    <style>
+        body {font-family: 'Arial', sans-serif; background-color: #f4f4f4; color: #333; margin: 0; padding: 0;}
+        header {background: linear-gradient(to right, #2c3E50, #FD746c); color: white; padding: 50px 20px; text-align: center;}
+        .logo h1 {font-size: 3em; margin: 0; font-weight: bold;}
+        .logo p {font-size: 1.3em; margin-top: 10px;}
+        .hero-image {background-image: url('images/background.png'); height: 300px; background-size: cover; background-position: center; border-radius: 10px; margin: 20px 0;}
+        .features {display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; margin: 30px 0;}
+        .feature {
+            background: white; padding: 20px; border-radius: 8px;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.1); width: 250px; text-align: center;
+            cursor: pointer; transition: box-shadow 0.2s, transform 0.2s;
+        }
+        .feature:focus {outline: 3px solid #FD746c;}
+        .feature:hover {
+            box-shadow: 0 8px 40px rgba(44,62,80,0.2);
+            transform: translateY(-4px) scale(1.03);
+        }
+        .qr-section {margin: 40px 0; text-align: center;}
+        .book-btn {display: inline-block; padding: 15px 30px; background: #2C3E50; color: white; border-radius: 5px; text-decoration: none; font-size: 1.2em;}
+        .book-btn:hover {background: #E74C3C;}
+        /* Booking form inside modal */
+        .field-row {display:flex; gap:10px; align-items:center; justify-content:center; margin:10px 0;}
+        .field-row label {min-width:80px; text-align:left; font-weight:600;}
+        .field-row input[type="number"], .field-row input[type="date"] {
+            padding:8px 10px; border-radius:6px; border:1px solid #ddd; min-width:120px;
+        }
+        .btn-primary {
+            display:inline-block; background: linear-gradient(90deg,#2C3E50,#FD746c); color:white; padding:10px 16px; border-radius:8px; text-decoration:none; border:none; cursor:pointer;
+        }
+        .summary {margin-top:10px; font-size:0.95rem; color:#333;}
+        /* Modal styles */
+        .modal {
+            display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%;
+            overflow: auto; background-color: rgba(0,0,0,0.7);
+        }
+        .modal[aria-hidden="false"] {display: block;}
+        .modal-content {
+            background-color: #fff; margin: 6% auto; padding: 20px; border-radius: 8px; width: 90%; max-width: 520px; text-align: center; position: relative;
+        }
+        .modal-content img {max-width: 100%; border-radius: 8px; margin-bottom: 10px;}
+        .close {
+            color: #aaa; position: absolute; top: 10px; right: 20px; font-size: 28px; font-weight: bold; cursor: pointer;
+        }
+        .close:hover {color: #E74C3C;}
+        footer {background: #2C3E50; color: white; text-align: center; padding: 15px 0; margin-top: 40px;}
+        .footer-address {margin-top: 10px;}
+        .footer-address a {color: #FFD700;}
+        .price-summary {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            text-align: left;
+        }
+        /* Restaurant order styles */
+        .order-summary {
+            background: white;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 500px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        #totalPrice {
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 1.2em;
+            text-align: right;
+        }
+        .submit-order {
+            background: #2C3E50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            width: 100%;
+        }
+        .submit-order:hover {
+            background: #FD746c;
+        }
+        
+        .price-summary .total {
+            font-weight: bold;
+            color: #2C3E50;
+            font-size: 1.1em;
+            margin-top: 5px;
+        }
+        #roomSummary {
+            color: #2C3E50;
+            margin: 10px 0;
+        }
+        /* gallery fold and lightbox helpers */
+        .location-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            align-items: start;
+        }
+        .location-gallery .gallery-item { text-align:center; }
+        .location-gallery .thumb {
+            width:100%;
+            height:120px;
+            object-fit:cover;
+            border-radius:6px;
+            cursor:pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: transform .15s, box-shadow .15s;
+        }
+        .location-gallery .thumb:hover { transform: translateY(-4px); box-shadow: 0 6px 18px rgba(0,0,0,0.12); }
+
+        /* folded state: limit height and add fade at bottom */
+        .location-gallery.fold {
+            max-height: 180px;
+            overflow: hidden;
+            position: relative;
+        }
+        .location-gallery.fold::after {
+            content: "";
+            position: absolute;
+            left: 0; right: 0; bottom: 0;
+            height: 48px;
+            background: linear-gradient(rgba(255,255,255,0), rgba(244,244,244,1));
+            pointer-events: none;
+        }
+        .toggle-fold-btn { margin-top: 10px; }
+
+        @media (max-width:600px) {
+            .feature {width: calc(100% - 60px);}
+            .field-row {flex-direction:column; align-items:stretch;}
+            .field-row label {text-align:left;}
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>Guest House Bel Aspect</h1>
+            <p>Your comfort is our priority!</p>
+        </div>
+        <div class="hero-image" role="img" aria-label="Guest House exterior"></div>
+    </header>
+    <main>
+        <section class="features" aria-label="Features">
+            <div class="feature" role="button" tabindex="0" onclick="openModal('roomModal')" onkeydown="if(event.key==='Enter' || event.key===' ') openModal('roomModal')">
+                <h2>Comfortable Rooms</h2>
+                <p>Choose from Standard or Luxury rooms, all with modern amenities.</p>
+            </div>
+            <div class="feature" role="button" tabindex="0" onclick="openModal('breakfastModal')" onkeydown="if(event.key==='Enter' || event.key===' ') openModal('breakfastModal')">
+                <h2>Delicious Breakfast</h2>
+                <p>Enjoy a simple breakfast to start your day right.</p>
+            </div>
+            <div class="feature" role="button" tabindex="0" onclick="openModal('locationModal')" onkeydown="if(event.key==='Enter' || event.key===' ') openModal('locationModal')">
+                <h2>Great Location</h2>
+                <p>Located in a quiet, accessible area close to city attractions.</p>
+            </div>
+            <div class="feature" role="button" tabindex="0" onclick="window.location.href='restaurant.html'">
+                <h2>Restaurant & Bar</h2>
+                <p>Enjoy local and international cuisine at our restaurant.</p>
+            </div>
+        </section>
+        <div style="text-align:center; margin-bottom: 20px;">
+            <h2>Our Address</h2>
+            <p>
+                Guest House Bel Aspect<br>
+                <a href="https://maps.app.goo.gl/TWzARKh99ud3VvzS6" target="_blank" rel="noopener noreferrer">
+                    View on Google Maps
+                </a>
+            </p>
+        </div>
+        <div class="qr-section">
+            <p>Scan to visit our website:</p>
+            <img 
+                src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://samymujinga14-ui.github.io/bel-aspect-guest-house/" 
+                alt="QR Code to Guest House Bel Aspect" 
+                style="background:white; padding:8px; border-radius:8px;"
+                loading="lazy"
+            >
+            <noscript><p><a href="https://samymujinga14-ui.github.io/bel-aspect-guest-house/" target="_blank" rel="noopener noreferrer">Open website</a></p></noscript>
+        </div>
+        <div style="text-align:center;">
+            <!-- open booking modal instead of plain link -->
+            <a href="#" class="book-btn" id="bookBtn" onclick="openModal('bookingModal'); return false;">Book Now</a>
+        </div>
+
+        <!-- Button to view restaurant menu -->
+        <div style="text-align:center; margin: 20px 0;">
+            <button id="restaurantMenuButton" class="btn-primary">View Restaurant Menu</button>
+        </div>
+
+        <!-- Food order section (initially hidden) -->
+        <div id="foodOrderSection" style="display:none; margin-top:40px;">
+            <h2>Order Food</h2>
+            <div id="foodItems">
+                <label><input type="checkbox" class="food-item" data-price="10"> Pizza - $10</label><br>
+                <label><input type="checkbox" class="food-item" data-price="8"> Burger - $8</label><br>
+                <label><input type="checkbox" class="food-item" data-price="5"> Salad - $5</label><br>
+                <label><input type="checkbox" class="food-item" data-price="7"> Pasta - $7</label><br>
+            </div>
+            <div>
+                <strong>Total: $<span id="totalPrice">0</span></strong>
+            </div>
+            <button id="submitOrderButton" class="btn-primary">Submit Order</button>
+        </div>
+    </main>
+
+    <!-- Modals for images -->
+    <div id="roomModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="roomModalTitle">
+        <div class="modal-content" tabindex="-1">
+            <button class="close" aria-label="Close" onclick="closeModal('roomModal')">&times;</button>
+            <h3 id="roomModalTitle">Room Pictures</h3>
+            <img src="images/room1.png" alt="Room Picture" loading="lazy">
+        </div>
+    </div>
+    <div id="breakfastModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="breakfastModalTitle">
+        <div class="modal-content" tabindex="-1">
+            <button class="close" aria-label="Close" onclick="closeModal('breakfastModal')">&times;</button>
+            <h3 id="breakfastModalTitle">Breakfast</h3>
+            <img src="images/breakfast1.png" alt="Breakfast Picture 1" loading="lazy">
+            <img src="images/breakfast2.png" alt="Breakfast Picture 2" loading="lazy">
+        </div>
+    </div>
+    <div id="locationModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="locationModalTitle">
+        <div class="modal-content" tabindex="-1">
+            <button class="close" aria-label="Close" onclick="closeModal('locationModal')">&times;</button>
+            <h3 id="locationModalTitle">Location</h3>
+            <!-- Folded responsive gallery: thumbnails, expand/collapse and lightbox -->
+            <div class="location-gallery fold" id="locationGallery">
+                <figure class="gallery-item">
+                    <img src="images/location1.png" alt="Guest House Exterior View" class="thumb" loading="lazy" onclick="openImageLightbox('images/location1.png','Front view of Guest House Bel Aspect')">
+                    <figcaption>Front view of Guest House Bel Aspect</figcaption>
+                </figure>
+                <figure class="gallery-item">
+                    <img src="images/location2.png" alt="Neighborhood Area" class="thumb" loading="lazy" onclick="openImageLightbox('images/location2.png','Peaceful surrounding neighborhood')">
+                    <figcaption>Peaceful surrounding neighborhood</figcaption>
+                </figure>
+                <figure class="gallery-item">
+                    <img src="images/location3.png" alt="Nearby Attractions" class="thumb" loading="lazy" onclick="openImageLightbox('images/location3.png','Local attractions within walking distance')">
+                    <figcaption>Local attractions within walking distance</figcaption>
+                </figure>
+                <!-- add more thumbnails as needed -->
+            </div>
+            <div style="text-align:center;">
+                <button type="button" class="btn-primary toggle-fold-btn" id="toggleGalleryBtn" onclick="toggleFold('locationGallery','toggleGalleryBtn')">Show more</button>
+            </div>
+        </div>
+    </div>
+    <!-- Image lightbox modal (reused small modal style) -->
+    <div id="imgLightbox" class="modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="imgLightboxTitle">
+        <div class="modal-content" tabindex="-1">
+            <button class="close" aria-label="Close" onclick="closeModal('imgLightbox')">&times;</button>
+            <h3 id="imgLightboxTitle" style="display:none">Image preview</h3>
+            <img id="lightboxImg" src="" alt="" style="max-width:100%; height:auto; border-radius:6px;">
+        </div>
+    </div>
+
+    <!-- Booking modal: number of rooms and length of stay -->
+    <div id="bookingModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="bookingModalTitle">
+        <div class="modal-content" tabindex="-1">
+            <button class="close" aria-label="Close" onclick="closeModal('bookingModal')">&times;</button>
+            <h3 id="bookingModalTitle">Start your booking</h3>
+
+            <form id="bookingForm" aria-describedby="bookingHelp">
+                <div class="field-row">
+                    <label for="checkin">Check-in</label>
+                    <input type="date" id="checkin" name="checkin" required>
+                </div>
+
+                <div class="field-row">
+                    <label for="nights">Nights</label>
+                    <input type="number" id="nights" name="nights" min="1" max="30" value="1" required>
+                </div>
+
+                <div class="field-row">
+                    <label for="roomType">Room Type</label>
+                    <select id="roomType" name="roomType" required onchange="updateRoomNumbers()">
+                        <option value="standard">Standard Room (cdf85000 /night)</option>
+                        <option value="luxury">Luxury Room (cdf140000/night)</option>
+                    </select>
+                </div>
+
+                <div class="field-row">
+                    <label for="roomNumber">Room Number</label>
+                    <select id="roomNumber" name="roomNumber" required>
+                        <!-- Will be populated by JavaScript -->
+                    </select>
+                </div>
+
+                <div id="bookingHelp" class="summary">
+                    <p>Room Details:</p>
+                    <div id="roomSummary"></div>
+                    <div id="priceSummary" class="price-summary"></div>
+                </div>
+
+                <div style="margin-top:14px;">
+                    <button type="submit" class="btn-primary" id="proceedBooking">Proceed to booking</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Restaurant Menu Section (merged from restaurant.html) -->
+    <section id="restaurant" aria-label="Restaurant Menu">
+        <header>
+            <h1>Restaurant & Bar Menu</h1>
+            <p>Guest House Bel Aspect</p>
+        </header>
+
+        <nav class="menu-nav">
+            <button onclick="showSection('breakfast')">Breakfast</button>
+            <button onclick="showSection('lunch')">Lunch</button>
+            <button onclick="showSection('dinner')">Dinner</button>
+            <button onclick="showSection('drinks')">Drinks</button>
+        </nav>
+
+        <div id="breakfast" class="menu-section">
+            <h2>Breakfast Menu</h2>
+            <div class="menu-item">
+                <img src="images/menu/placeholder.png" alt="Dish name">
+                <div class="menu-item-details">
+                    <h3>Dish Name</h3>
+                    <p>Description of the dish goes here</p>
+                    <p class="price">CDF 0</p>
+                </div>
+                <button class="order-btn" onclick="addToOrder(1)">Order</button>
+            </div>
+        </div>
+
+        <div id="lunch" class="menu-section" style="display:none">
+            <h2>Lunch Menu</h2>
+            <!-- Add lunch menu items here -->
+        </div>
+
+        <div id="dinner" class="menu-section" style="display:none">
+            <h2>Dinner Menu</h2>
+            <!-- Add dinner menu items here -->
+        </div>
+
+        <div id="drinks" class="menu-section" style="display:none">
+            <h2>Drinks Menu</h2>
+            <!-- Add drinks menu items here -->
+        </div>
+
+        <!-- Order Summary and Form -->
+        <div id="orderSummary" class="order-summary">
+            <h2>Your Order</h2>
+            <div id="selectedItems">
+                <!-- Selected items will be listed here -->
+            </div>
+            <div id="totalPrice">Total: CDF 0</div>
+            
+            <form id="orderForm" action="https://formspree.io/f/samymujinga52@gmail.com" method="POST">
+                <input type="hidden" id="orderDetails" name="orderDetails" value="">
+                <input type="hidden" id="orderTotal" name="orderTotal" value="">
+                
+                <div class="field-row">
+                    <label for="customerName">Name:</label>
+                    <input type="text" id="customerName" name="customerName" required>
+                </div>
+                
+                <div class="field-row">
+                    <label for="customerEmail">Email:</label>
+                    <input type="email" id="customerEmail" name="customerEmail" required>
+                </div>
+                
+                <div class="field-row">
+                    <label for="customerPhone">Phone:</label>
+                    <input type="tel" id="customerPhone" name="customerPhone" required>
+                </div>
+                
+                <button type="submit" class="submit-order">Submit Order</button>
+            </form>
+        </div>
+
+        <script>
+            function showSection(sectionId) {
+                // Hide all sections
+                document.querySelectorAll('.menu-section').forEach(section => {
+                    section.style.display = 'none';
+                });
+                // Show selected section
+                document.getElementById(sectionId).style.display = 'block';
+            }
+
+            let orderItems = [];
+            let total = 0;
+
+            function addToOrder(itemId) {
+                // Get the menu item details
+                const menuItem = document.querySelector(`[data-item-id="${itemId}"]`);
+                const name = menuItem.querySelector('h3').textContent;
+                const price = parseInt(menuItem.querySelector('.price').textContent.replace('CDF ', ''));
+                
+                // Add to order array
+                orderItems.push({ id: itemId, name: name, price: price });
+                
+                // Update total
+                total += price;
+                
+                // Update the display
+                updateOrderDisplay();
+            }
+
+            function updateOrderDisplay() {
+                const selectedItemsDiv = document.getElementById('selectedItems');
+                const totalDiv = document.getElementById('totalPrice');
+                const orderDetailsInput = document.getElementById('orderDetails');
+                const orderTotalInput = document.getElementById('orderTotal');
+                
+                // Clear and rebuild the selected items display
+                selectedItemsDiv.innerHTML = '';
+                orderItems.forEach(item => {
+                    selectedItemsDiv.innerHTML += `
+                        <div class="order-item">
+                            <span>${item.name}</span>
+                            <span>CDF ${item.price}</span>
+                        </div>
+                    `;
+                });
+                
+                // Update total display
+                totalDiv.textContent = `Total: CDF ${total}`;
+                
+                // Update hidden form fields
+                orderDetailsInput.value = JSON.stringify(orderItems);
+                orderTotalInput.value = total;
+            }
+
+            // Handle form submission
+            document.getElementById('orderForm').addEventListener('submit', function(e) {
+                if (orderItems.length === 0) {
+                    e.preventDefault();
+                    alert('Please select at least one item before submitting your order.');
+                    return false;
+                }
+            });
+        </script>
+    </section>
+
+    <script>
+        // Manage open/close state and focus for accessibility
+        let lastFocused = null;
+        function openModal(id) {
+            const modal = document.getElementById(id);
+            if (!modal) return;
+            lastFocused = document.activeElement;
+            modal.setAttribute('aria-hidden', 'false');
+            const content = modal.querySelector('.modal-content');
+            // focus the content so screen readers jump into dialog
+            content.focus();
+            // trap focus inside modal
+            document.addEventListener('focus', trapFocus, true);
+        }
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            if (!modal) return;
+            modal.setAttribute('aria-hidden', 'true');
+            document.removeEventListener('focus', trapFocus, true);
+            if (id === 'imgLightbox') {
+                const img = document.getElementById('lightboxImg');
+                if (img) {
+                    img.src = ''; // Clear the image source
+                }
+            }
+        }
+
+        function trapFocus(e) {
+            const modal = document.querySelector('.modal[aria-hidden="false"]');
+            if (!modal) return;
+            const focusableElements = modal.querySelectorAll('a[href], area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"])');
+            const firstElement = focusableElements[0];
+            const lastElement = focusableElements[focusableElements.length - 1];
+            if (e.target === lastElement && !e.shiftKey) {
+                // last element focused and Tab pressed
+                e.preventDefault();
+                firstElement.focus();
+            } else if (e.target === firstElement && e.shiftKey) {
+                // first element focused and Shift+Tab pressed
+                e.preventDefault();
+                lastElement.focus();
+            }
+        }
+
+        // Initial setup: open the booking modal if coming from a referral link
+        window.addEventListener('load', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('ref') && urlParams.get('ref') === 'booking') {
+                openModal('bookingModal');
+            }
+        });
+
+        // Room selection logic
+        function updateRoomNumbers() {
+            const roomType = document.getElementById('roomType').value;
+            const roomNumberSelect = document.getElementById('roomNumber');
+            roomNumberSelect.innerHTML = ''; // Clear existing options
+            let maxRooms = 0;
+            if (roomType === 'standard') {
+                maxRooms = 10;
+            } else if (roomType === 'luxury') {
+                maxRooms = 5;
+            }
+            for (let i = 1; i <= maxRooms; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = `Room ${i}`;
+                roomNumberSelect.appendChild(option);
+            }
+            updateRoomSummary();
+        }
+
+        // Update room summary and price based on selection
+        function updateRoomSummary() {
+            const roomType = document.getElementById('roomType').value;
+            const nights = document.getElementById('nights').value;
+            let pricePerNight = 0;
+            if (roomType === 'standard') {
+                pricePerNight = 85000;
+            } else if (roomType === 'luxury') {
+                pricePerNight = 140000;
+            }
+            const totalPrice = pricePerNight * nights;
+            document.getElementById('roomSummary').textContent = `${nights} night(s) in a ${roomType.charAt(0).toUpperCase() + roomType.slice(1)} Room`;
+            document.getElementById('priceSummary').innerHTML = `Total: <span class="total">CDF ${totalPrice.toLocaleString()}</span>`;
+        }
+
+        // Toggle fold/unfold of the gallery
+        function toggleFold(galleryId, buttonId) {
+            const gallery = document.getElementById(galleryId);
+            const button = document.getElementById(buttonId);
+            if (gallery.classList.contains('fold')) {
+                gallery.classList.remove('fold');
+                button.textContent = 'Show less';
+            } else {
+                gallery.classList.add('fold');
+                button.textContent = 'Show more';
+            }
+        }
+
+        // Open image in lightbox
+        function openImageLightbox(imgSrc, imgAlt) {
+            const lightboxImg = document.getElementById('lightboxImg');
+            const imgLightboxTitle = document.getElementById('imgLightboxTitle');
+            lightboxImg.src = imgSrc;
+            lightboxImg.alt = imgAlt;
+            imgLightboxTitle.textContent = imgAlt;
+            imgLightboxTitle.style.display = 'block';
+            openModal('imgLightbox');
+        }
+
+        // Close modals when clicking outside of them
+        window.onclick = function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    closeModal(modal.id);
+                }
+            });
+        }
+
+        // Food order functionality
+        const foodItems = document.querySelectorAll('.food-item');
+        const totalPriceElement = document.getElementById('totalPrice');
+        let foodTotal = 0;
+
+        foodItems.forEach(item => {
+            item.addEventListener('change', function() {
+                const price = parseFloat(this.getAttribute('data-price'));
+                foodTotal += this.checked ? price : -price;
+                totalPriceElement.textContent = foodTotal.toFixed(2);
+            });
+        });
+
+        document.getElementById('submitOrderButton').addEventListener('click', function() {
+            // Handle order submission here
+            alert('Order submitted! Total: $' + foodTotal.toFixed(2));
+            // Here you would send the email with order details
+        });
+    </script>
+</body>
+</html>
